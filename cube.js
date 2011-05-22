@@ -39,14 +39,19 @@ document.addEventListener('DOMContentLoaded', function() {
   
   d.c.translate(320, 240);
 
-  var is_stopped = false;
+  var is_stopped = false,
+      animation_angles = [rnd(10), rnd(5), rnd(8)];
+  function update_animation_angles(dx, dy, dz) {
+    dx && (animation_angles[0] += dx);
+    dy && (animation_angles[1] += dy);
+    dz && (animation_angles[2] += dz);
+  }
 
   function draw(xA, yA, zA) {
+    xA *= Math.PI / 300;
+    yA *= Math.PI / 300;
+    zA *= Math.PI / 300;
     // rotation speeds
-    rad = counter++ / 50;
-    var xA = xA || rad * 0.8,
-        yA = yA || rad * 0.5,
-        zA = zA || rad * 1.8;
     var rM = rotation_matrix(xA, yA, zA);
 
     for (var i = 0, l = edges.length; i < l; i++) {
@@ -56,13 +61,12 @@ document.addEventListener('DOMContentLoaded', function() {
       var to = MxV_fast(rM, verts[edge[1]]);
 
       // apply perspective
-      from = perspective(from, P);
-      to = perspective(to, P);
+      from = perspective(from, PERS);
+      to = perspective(to, PERS);
 
       // draw edge
       d.line(from, to);
     }
-
   }
   function clear() {
     d.c.clearRect(-320, -240, d.w, d.h);
@@ -70,28 +74,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
   (function animloop(){
     if (!is_stopped) {
-      clear(); draw();
+      clear();
+      update_animation_angles(4, 6, 2);
+
+      draw.apply(this, animation_angles);
     }
     requestAnimFrame(animloop);
   })();
 
-  var oM;
+  var prev_coords;
   canvas.addEventListener('mousedown', function(event) {
     is_stopped = true;
-    oM = [event.clientX, event.clientY];
+    prev_coords = [event.clientX, event.clientY];
+
   }, false);
   canvas.addEventListener('mouseup', function(event) {
     is_stopped = false;
   }, false);
-  function manual_rotate (current, initial) {
-    return ((current - initial) / 100 * Math.PI)
-  }
   canvas.addEventListener('mousemove', function(event) {
     if (is_stopped) {
-      var cM = [event.clientX, event.clientY];
+      var coords = [event.clientX, event.clientY];
+      var delta = [prev_coords[0] - coords[0], prev_coords[1] - coords[1]];
 
       clear();
-      draw(manual_rotate(cM[0], oM[0]), manual_rotate(cM[1], oM[1]), 1);
+      update_animation_angles(0.5 * delta[0], 0.5 * delta[1])
+      draw.apply(this, animation_angles);
+      prev_coords = coords;
     }
   }, false);
 
