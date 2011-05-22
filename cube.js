@@ -29,18 +29,22 @@ var edges = [
   [7, 4],
 ]
 
-var counter = 0, rad, P = 500;
+// constants
+var PERS = 500, SCALE = 125;
+
 
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.getElementById('canvas');
   var d = new Draw(canvas)
   
-  verts = scale(verts, 100);
+  verts = scale(verts, SCALE);
   
-  d.c.translate(320, 240);
+  d.c.translate(d.w / 2, d.h / 2);
 
   var is_stopped = false,
+      // initial cube rotation, random is fun
       animation_angles = [rnd(10), rnd(5), rnd(8)];
+
   function update_animation_angles(dx, dy, dz) {
     dx && (animation_angles[0] += dx);
     dy && (animation_angles[1] += dy);
@@ -69,12 +73,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   function clear() {
-    d.c.clearRect(-320, -240, d.w, d.h);
+    // since we have been translated to 320, 240 we should start our clearing 
+    // from the actual 0, 0
+    d.c.clearRect(d.w / -2, d.h / -2, d.w, d.h);
   }
 
   (function animloop(){
     if (!is_stopped) {
       clear();
+      // these control rotation speed per axis
       update_animation_angles(4, 6, 2);
 
       draw.apply(this, animation_angles);
