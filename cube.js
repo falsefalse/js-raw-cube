@@ -32,14 +32,16 @@ var edges = [
 var counter = 0, rad, P = 500;
 
 document.addEventListener('DOMContentLoaded', function() {
-  var d = new Draw(document.getElementById('canvas'))
+  var canvas = document.getElementById('canvas');
+  var d = new Draw(canvas)
   
   verts = scale(verts, 100);
   
   d.c.translate(320, 240);
 
+  var is_stopped = false;
+
   function draw() {
-    
     // rotation speeds
     var xA = rad * 1, yA = rad * 1, zA = rad * 1;
     var rM = rotation_matrix(xA, yA, zA);
@@ -57,10 +59,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     rad = counter++ / 50;
   }
+  function clear() {
+    d.c.clearRect(-320, -240, d.w, d.h);
+  }
 
   (function animloop(){
-    d.c.clearRect(-320, -240, d.w, d.h);
-    draw();
+    if (!is_stopped) {
+      clear();
+      draw();
+    }
     requestAnimFrame(animloop);
   })();
+
+  canvas.addEventListener('mousedown', function(event) {
+    is_stopped = true;
+  }, false);
+  canvas.addEventListener('mouseup', function(event) {
+    is_stopped = false;
+  }, false);
+  canvas.addEventListener('mousemove', function(event) {
+  }, false);
+
 }, false)
