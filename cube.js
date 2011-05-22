@@ -29,7 +29,7 @@ var edges = [
   [7, 4],
 ]
 
-var counter = 0, rad, persp = 500;
+var counter = 0, rad, P = 500;
 
 document.addEventListener('DOMContentLoaded', function() {
   var d = new Draw(document.getElementById('canvas'))
@@ -49,10 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
       var from = MxV_fast(rM, verts[edge[0]]);
       var to = MxV_fast(rM, verts[edge[1]]);
 
-      from[0] /= 1 + from[2]/persp;
-      from[1] /= 1 + from[2]/persp;
-      to[0]   /= 1 + to[2]/persp;
-      to[1]   /= 1 + to[2]/persp;
+      from = perspective(from, P);
+      to = perspective(to, P);
 
       d.line(from, to);
     }

@@ -45,6 +45,13 @@ function rotation_matrix (x, y, z) {
   ]
 }
 
+function perspective (vert, persp) {
+  vert[0] /= 1 + vert[2] / persp;
+  vert[1] /= 1 + vert[2] / persp;
+
+  return vert;
+}
+
 var Draw = function(canvas) {
   this.c = canvas.getContext('2d');
 
