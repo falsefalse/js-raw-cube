@@ -41,23 +41,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var is_stopped = false;
 
-  function draw() {
+  function draw(xA, yA, zA) {
     // rotation speeds
-    var xA = rad * 0.8, yA = rad * 0.5, zA = rad * 1.8;
+    rad = counter++ / 50;
+    var xA = xA || rad * 0.8,
+        yA = yA || rad * 0.5,
+        zA = zA || rad * 1.8;
     var rM = rotation_matrix(xA, yA, zA);
 
     for (var i = 0, l = edges.length; i < l; i++) {
       var edge = edges[i];
+      // apply rotation
       var from = MxV_fast(rM, verts[edge[0]]);
       var to = MxV_fast(rM, verts[edge[1]]);
 
+      // apply perspective
       from = perspective(from, P);
       to = perspective(to, P);
 
+      // draw edge
       d.line(from, to);
     }
 
-    rad = counter++ / 50;
   }
   function clear() {
     d.c.clearRect(-320, -240, d.w, d.h);
@@ -65,19 +70,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
   (function animloop(){
     if (!is_stopped) {
-      clear();
-      draw();
+      clear(); draw();
     }
     requestAnimFrame(animloop);
   })();
 
+  var oM;
   canvas.addEventListener('mousedown', function(event) {
     is_stopped = true;
+    oM = [event.clientX, event.clientY];
   }, false);
   canvas.addEventListener('mouseup', function(event) {
     is_stopped = false;
   }, false);
+  function manual_rotate (current, initial) {
+    return ((current - initial) / 100 * Math.PI)
+  }
   canvas.addEventListener('mousemove', function(event) {
+    if (is_stopped) {
+      var cM = [event.clientX, event.clientY];
+
+      clear();
+      draw(manual_rotate(cM[0], oM[0]), manual_rotate(cM[1], oM[1]), 1);
+    }
   }, false);
 
 }, false)
