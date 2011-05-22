@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function draw() {
     // rotation speeds
-    var xA = rad * 1, yA = rad * 1, zA = rad * 1;
+    var xA = rad * 0.8, yA = rad * 0.5, zA = rad * 1.8;
     var rM = rotation_matrix(xA, yA, zA);
 
     for (var i = 0, l = edges.length; i < l; i++) {
