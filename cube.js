@@ -36,9 +36,9 @@ var PERS = 500, SCALE = 125;
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.getElementById('canvas');
   var d = new Draw(canvas)
-  
+
   verts = scale(verts, SCALE);
-  
+
   d.c.translate(d.w / 2, d.h / 2);
 
   var is_stopped = false,
@@ -51,12 +51,12 @@ document.addEventListener('DOMContentLoaded', function() {
     dz && (animation_angles[2] += dz);
   }
 
-  function draw(xA, yA, zA) {
-    xA *= Math.PI / 300;
-    yA *= Math.PI / 300;
-    zA *= Math.PI / 300;
+  function draw(dx, dy, dz) {
+    dx *= Math.PI / 400;
+    dy *= Math.PI / 400;
+    dz *= Math.PI / 400;
     // rotation speeds
-    var rM = rotation_matrix(xA, yA, zA);
+    var rM = rotation_matrix(dx, dy, dz);
 
     for (var i = 0, l = edges.length; i < l; i++) {
       var edge = edges[i];
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   function clear() {
-    // since we have been translated to 320, 240 we should start our clearing 
+    // since we have been translated to 320, 240 we should start our clearing
     // from the actual 0, 0
     d.c.clearRect(d.w / -2, d.h / -2, d.w, d.h);
   }
@@ -82,32 +82,32 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!is_stopped) {
       clear();
       // these control rotation speed per axis
-      update_animation_angles(4, 6, 2);
+      update_animation_angles(2, 3, 1);
 
       draw.apply(this, animation_angles);
     }
-    requestAnimFrame(animloop);
+    requestAnimFrame(animloop, canvas);
   })();
 
   var prev_coords;
   canvas.addEventListener('mousedown', function(event) {
     is_stopped = true;
     prev_coords = [event.clientX, event.clientY];
-
   }, false);
+
   canvas.addEventListener('mouseup', function(event) {
     is_stopped = false;
   }, false);
+
   canvas.addEventListener('mousemove', function(event) {
     if (is_stopped) {
       var coords = [event.clientX, event.clientY];
       var delta = [prev_coords[0] - coords[0], prev_coords[1] - coords[1]];
 
       clear();
-      update_animation_angles(0.5 * delta[0], 0.5 * delta[1])
+      update_animation_angles(0.5 * delta[0], 0.5 * delta[1]);
       draw.apply(this, animation_angles);
       prev_coords = coords;
     }
   }, false);
-
-}, false)
+}, false);
