@@ -1,18 +1,26 @@
 // hello, here we will try to make a 3D cube on 2D canvas
 // how awesome is that
 
+// constants
+var PERS = 500, SCALE = 125;
+
 // x, y, z
 // center of the cube is in 0, 0, 0
 var verts = [
-  [-1, -1,  1],
-  [-1, -1, -1],
-  [ 1, -1, -1],
-  [ 1, -1,  1],
-  [-1,  1,  1],
-  [-1,  1, -1],
-  [ 1,  1, -1],
-  [ 1,  1,  1],
-]
+  [-1, -1, -1], // 0
+  [-1, -1,  1], // 1
+  [ 1, -1,  1], // 2
+  [ 1, -1, -1], // 3
+  [-1,  1, -1], // 4
+  [-1,  1,  1], // 5
+  [ 1,  1,  1], // 6
+  [ 1,  1, -1], // 7
+].map(function(vert) {
+  // scale coords to make cube to look something bigger than 2×2
+  return vert.map(function(coord) {
+    return coord * SCALE;
+  })
+})
 
 var edges = [
   [0, 1],
@@ -27,17 +35,30 @@ var edges = [
   [5, 6],
   [6, 7],
   [7, 4],
-]
+].map(function(edge) {
+  // compose array of verticies for cube edges, 2 verts per edge
+  return edge.map(function(vI) {
+    return verts[vI];
+  });
+});
 
-// constants
-var PERS = 500, SCALE = 125;
-
+var sides = [
+  [0, 1, 2, 3], // bottom
+  [4, 5, 6, 7], // top
+  [0, 4, 5, 1], // left
+  [1, 5, 6, 2], // back
+  [3, 7, 6, 2], // right
+  [0, 4, 7, 3], // front
+].map(function(side) {
+  // compose array of cube sides, 4 verts per side
+  return side.map(function(vI) {
+    return verts[vI];
+  });
+});
 
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.getElementById('canvas');
   var d = new Draw(canvas)
-
-  verts = scale(verts, SCALE);
 
   d.c.translate(d.w / 2, d.h / 2);
 
@@ -60,17 +81,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     for (var i = 0, l = edges.length; i < l; i++) {
       var edge = edges[i];
-      // apply rotation
-      var from = MxV_fast(rM, verts[edge[0]]);
-      var to = MxV_fast(rM, verts[edge[1]]);
 
-      // apply perspective
-      from = perspective(from, PERS);
-      to = perspective(to, PERS);
-
-      // draw edge
-      d.line(from, to);
+      d.line.apply(d, edge.map(function(point) {
+        // apply rotation and perspective
+        return perspective( MxV_fast(rM, point), PERS );
+      }));
     }
+
+    for (var i = 0, l = sides.length; i < l; i++) {
+      var side = sides[i];
+
+      d.edge(side.map(function(point) {
+        // apply rotation and perspective
+        return perspective( MxV_fast(rM, point), PERS );
+      }));
+    }
+
   }
   function clear() {
     // since we have been translated to 320, 240 we should start our clearing

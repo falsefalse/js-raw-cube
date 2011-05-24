@@ -4,13 +4,6 @@ var rnd = function(bound) {
   return Math.ceil(Math.random() * bound)
 };
 
-function scale(verts, factor) {
-  return verts.map(function(vert) {
-    return vert.map(function(coord){
-      return coord * factor;
-    })
-  })
-}
 
 function MxV_fast (matrix, vector) {
   return [
@@ -63,6 +56,19 @@ var Draw = function(canvas) {
     this.c.stroke();
   }
 
+  // draw edge
+  this.edge = function(points) {
+    this.c.beginPath();
+    this.c.moveTo(points[0][0], points[0][1]);
+    for (var i = 0, l = points.length; i < l; i++) {
+      var next_i = (i + 1 === l) ? 0 : i + 1;
+      this.c.lineTo( points[next_i][0], points[next_i][1] );
+      this.c.stroke()
+    }
+    this.c.fill();
+    this.c.closePath();
+  }
+
   // dimensions
   this.w = canvas.width;
   this.h = canvas.height;
@@ -70,6 +76,7 @@ var Draw = function(canvas) {
   // set shit up
   this.c.lineWidth = 1;
   this.c.strokeStyle = "#000";
+  this.c.fillStyle = "#000";
 }
 
 window.requestAnimFrame = (function(){
