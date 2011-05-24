@@ -45,6 +45,23 @@ function perspective (vert, persp) {
   return vert;
 }
 
+function rgb(r, g, b) {
+  var args = Array.prototype.map.call(arguments, function(color) {
+    return Math.ceil(color);
+  })
+  return 'rgb(' + args.join(', ') +  ')';
+}
+
+function is_facing(side) {
+  var p0 = side[0];
+  var p1 = side[1];
+  var p2 = side[2];
+
+  var crossproduct_z = ( (p0[0] - p1[0]) * (p1[1] - p2[1]) ) - ( (p1[0] - p2[0]) * (p0[1] - p1[1]));
+
+  return crossproduct_z > 0;
+}
+
 var Draw = function(canvas) {
   this.c = canvas.getContext('2d');
 
@@ -57,16 +74,17 @@ var Draw = function(canvas) {
   }
 
   // draw edge
-  this.edge = function(points) {
+  this.edge = function(points, style) {
+    this.c.fillStyle = style || this.c.fillStyle;
+    this.c.strokeStyle = style || this.c.strokeStyle;
+
     this.c.beginPath();
     this.c.moveTo(points[0][0], points[0][1]);
     for (var i = 0, l = points.length; i < l; i++) {
       var next_i = (i + 1 === l) ? 0 : i + 1;
       this.c.lineTo( points[next_i][0], points[next_i][1] );
-      this.c.stroke()
     }
     this.c.fill();
-    this.c.closePath();
   }
 
   // dimensions

@@ -42,13 +42,14 @@ var edges = [
   });
 });
 
+// looking from outside of the cube, CCW
 var sides = [
   [0, 1, 2, 3], // bottom
-  [4, 5, 6, 7], // top
+  [7, 6, 5, 4], // top
   [0, 4, 5, 1], // left
   [1, 5, 6, 2], // back
-  [3, 7, 6, 2], // right
-  [0, 4, 7, 3], // front
+  [2, 6, 7, 3], // right
+  [3, 7, 4, 0], // front
 ].map(function(side) {
   // compose array of cube sides, 4 verts per side
   return side.map(function(vI) {
@@ -79,22 +80,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // rotation speeds
     var rM = rotation_matrix(dx, dy, dz);
 
-    for (var i = 0, l = edges.length; i < l; i++) {
-      var edge = edges[i];
-
-      d.line.apply(d, edge.map(function(point) {
-        // apply rotation and perspective
-        return perspective( MxV_fast(rM, point), PERS );
-      }));
-    }
-
     for (var i = 0, l = sides.length; i < l; i++) {
       var side = sides[i];
 
-      d.edge(side.map(function(point) {
+      var transformed = side.map(function(point) {
         // apply rotation and perspective
         return perspective( MxV_fast(rM, point), PERS );
-      }));
+      });
+      // perspective fucks up the X and Y, so calculate normales after it
+      var do_show = is_facing(transformed);
+
+      if (do_show) {
+        var color = rgb(255 - (i * 42.5), 128 + (i / 3 * 42.5), 128 + (i / 2 * 42.5));
+        d.edge(transformed, color);
+      }
+
     }
 
   }
