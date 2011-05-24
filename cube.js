@@ -22,27 +22,8 @@ var verts = [
   })
 })
 
-var edges = [
-  [0, 1],
-  [1, 2],
-  [2, 3],
-  [3, 0],
-  [0, 4],
-  [1, 5],
-  [2, 6],
-  [3, 7],
-  [4, 5],
-  [5, 6],
-  [6, 7],
-  [7, 4],
-].map(function(edge) {
-  // compose array of verticies for cube edges, 2 verts per edge
-  return edge.map(function(vI) {
-    return verts[vI];
-  });
-});
-
 // looking from outside of the cube, CCW
+// order of points are important to determine sides that shouldn't be rendered
 var sides = [
   [0, 1, 2, 3], // bottom
   [7, 6, 5, 4], // top
@@ -67,13 +48,13 @@ document.addEventListener('DOMContentLoaded', function() {
       // initial cube rotation, random is fun
       animation_angles = [rnd(10), rnd(5), rnd(8)];
 
-  function update_animation_angles(dx, dy, dz) {
+  function update_animation_angles (dx, dy, dz) {
     dx && (animation_angles[0] += dx);
     dy && (animation_angles[1] += dy);
     dz && (animation_angles[2] += dz);
   }
 
-  function draw(dx, dy, dz) {
+  function draw (dx, dy, dz) {
     dx *= Math.PI / 400;
     dy *= Math.PI / 400;
     dz *= Math.PI / 400;
@@ -104,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
     d.c.clearRect(d.w / -2, d.h / -2, d.w, d.h);
   }
 
-  (function animloop(){
+  (function animloop() {
     if (!is_stopped) {
       clear();
       // these control rotation speed per axis
