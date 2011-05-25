@@ -4,39 +4,50 @@
 // constants
 var PERS = 500, SCALE = 125;
 
-// x, y, z
-// center of the cube is in 0, 0, 0
-var verts = [
-  [-1, -1, -1], // 0
-  [-1, -1,  1], // 1
-  [ 1, -1,  1], // 2
-  [ 1, -1, -1], // 3
-  [-1,  1, -1], // 4
-  [-1,  1,  1], // 5
-  [ 1,  1,  1], // 6
-  [ 1,  1, -1], // 7
-].map(function(vert) {
-  // scale coords to make cube to look something bigger than 2×2
-  return vert.map(function(coord) {
-    return coord * SCALE;
-  })
-})
+var cube = new Model(
+  // x, y, z
+  // center of the cube is in 0, 0, 0
+  [
+    [-1, -1, -1], // 0
+    [-1, -1,  1], // 1
+    [ 1, -1,  1], // 2
+    [ 1, -1, -1], // 3
+    [-1,  1, -1], // 4
+    [-1,  1,  1], // 5
+    [ 1,  1,  1], // 6
+    [ 1,  1, -1], // 7
+  ],
+  // looking from outside of the cube, CCW
+  // order of points are important to determine sides that shouldn't be rendered
+  [
+    [0, 1, 2, 3], // bottom
+    [7, 6, 5, 4], // top
+    [0, 4, 5, 1], // left
+    [1, 5, 6, 2], // back
+    [2, 6, 7, 3], // right
+    [3, 7, 4, 0], // front
+  ],
+  SCALE
+);
 
-// looking from outside of the cube, CCW
-// order of points are important to determine sides that shouldn't be rendered
-var sides = [
-  [0, 1, 2, 3], // bottom
-  [7, 6, 5, 4], // top
-  [0, 4, 5, 1], // left
-  [1, 5, 6, 2], // back
-  [2, 6, 7, 3], // right
-  [3, 7, 4, 0], // front
-].map(function(side) {
-  // compose array of cube sides, 4 verts per side
-  return side.map(function(vI) {
-    return verts[vI];
-  });
-});
+var pyramid = new Model(
+  [
+    [-1, -1, -1],
+    [-1, -1,  1],
+    [ 1, -1,  1],
+    [ 1, -1, -1],
+    [ 0,  1.25,  0],
+  ],
+  // looking from the inside, CW
+  [
+    [0, 1, 2, 3], // base
+    [3, 4, 0],    // front
+    [1, 4, 2],    // back
+    [0, 4, 1],    // left
+    [2, 4, 3],    // right
+  ],
+  SCALE
+)
 
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.getElementById('canvas');
@@ -54,15 +65,16 @@ document.addEventListener('DOMContentLoaded', function() {
     dz && (animation_angles[2] += dz);
   }
 
-  function draw (dx, dy, dz) {
-    dx *= Math.PI / 400;
-    dy *= Math.PI / 400;
-    dz *= Math.PI / 400;
-    // rotation speeds
-    var rM = rotation_matrix(dx, dy, dz);
+  var model = pyramid;
 
-    for (var i = 0, l = sides.length; i < l; i++) {
-      var side = sides[i];
+  function draw (model, animation_angles) {
+    // rotation speeds
+    var rM = rotation_matrix.apply(this, animation_angles.map(function(angle) {
+      return angle * Math.PI / 400;
+    }));
+
+    for (var i = 0, l = model.sides.length; i < l; i++) {
+      var side = model.sides[i];
 
       var transformed = side.map(function(point) {
         // apply rotation and perspective
@@ -91,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // these control rotation speed per axis
       update_animation_angles(2, 3, 1);
 
-      draw.apply(this, animation_angles);
+      draw(model, animation_angles);
     }
     requestAnimFrame(animloop, canvas);
   })();
@@ -113,8 +125,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
       clear();
       update_animation_angles(0.5 * delta[0], 0.5 * delta[1]);
-      draw.apply(this, animation_angles);
+      draw(model, animation_angles);
       prev_coords = coords;
     }
   }, false);
+
+  canvas.addEventListener('click', function(event) {
+    if (!event.ctrlKey) return;
+    if (model === cube) {
+      model = pyramid;
+    } else {
+      model = cube;
+    }
+  }, false);
+
 }, false);

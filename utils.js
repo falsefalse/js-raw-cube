@@ -122,6 +122,19 @@ var Draw = function(canvas) {
   this.c.fillStyle = "#000";
 }
 
+var Model = function(verticies, sides, scale) {
+  this.verticies = verticies;
+  this.sides = sides;
+
+  this.sides = sides.map(function(side) {
+    return side.map(function(vertex_index) {
+      return verticies[vertex_index].map(function(coord) {
+        return coord * scale;
+      });
+    });
+  });
+}
+
 // shim for requestAnimationFrame from Paul Irish
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame       ||
