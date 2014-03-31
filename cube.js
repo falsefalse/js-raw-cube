@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }, false);
 
   canvas.addEventListener('click', function(event) {
-    if (!event.ctrlKey) return;
+    if (!event.metaKey) return;
     if (model === cube) {
       model = pyramid;
     } else {
